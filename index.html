@@ -11,11 +11,11 @@
 
   <title>RevenueForge | Lead Management</title>
 
- <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script src="cloud.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="cloud.js" defer></script>
 </head>
 
 <body>
@@ -25,71 +25,22 @@
         Revenue<span>Forge</span>
       </a>
 
-     <div class="header-actions">
-  <span class="header-label">LEAD MANAGEMENT</span>
-  <button type="button" id="sign-out-button" class="secondary-button" hidden>
-    Sign Out
-  </button>
-</div>
+      <div class="header-actions">
+        <span class="header-label">LEAD MANAGEMENT</span>
+        <button
+          type="button"
+          id="sign-out-button"
+          class="secondary-button"
+          hidden
+        >
+          Sign Out
+        </button>
+      </div>
     </div>
   </header>
 
   <main class="container">
-        <!-- AUTHENTICATION -->
-     <div class="section-heading">
-        <div>
-          <p class="eyebrow">YOUR SALES WORKSPACE</p>
-          <h2>RevenueForge Login</h2>
-        </div>
-      </div>
 
-      <p class="section-description">
-        Sign in to manage your leads securely, or create an account to get started.
-      </p>
-
-      <form id="auth-form">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="auth-email">Email address</label>
-            <input
-              type="email"
-              id="auth-email"
-              placeholder="you@example.com"
-              autocomplete="email"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label for="auth-password">Password</label>
-            <input
-              type="password"
-              id="auth-password"
-              placeholder="At least 6 characters"
-              autocomplete="current-password"
-              minlength="6"
-              required
-            >
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="submit" id="sign-in-button" class="primary-button">
-            Sign In
-          </button>
-
-          <button type="button" id="sign-up-button" class="secondary-button">
-            Create Account
-          </button>
-
-          <button type="button" id="sign-out-button" class="secondary-button" hidden>
-            Sign Out
-          </button>
-        </div>
-
-        <p id="auth-message" class="feedback" role="status" aria-live="polite"></p>
-      </form>
-    </section>
     <!-- INTRODUCTION -->
     <section class="hero">
       <p class="eyebrow">YOUR SALES WORKSPACE</p>
@@ -190,7 +141,7 @@
       </div>
 
       <p class="storage-note">
-        Your leads are saved in this browser on this device.
+        Your leads are stored in your connected database.
       </p>
     </section>
 
@@ -381,18 +332,19 @@
     <section class="prototype-notice">
       <strong>Prototype notice</strong>
       <p>
-        RevenueForge currently stores leads locally in your browser.
-        The dashboard is not connected to a shared database, and the
-        message generator does not use an AI API.
+        RevenueForge uses Supabase for cloud data storage.
+        The message generator uses built-in templates and does not
+        currently connect to an AI API.
       </p>
     </section>
+
   </main>
 
   <footer class="site-footer">
     <div class="container">
       <p>
         &copy; <span id="year">2026</span> RevenueForge
-        &middot; Lead Management Prototype
+        &middot; Lead Management
       </p>
     </div>
   </footer>
