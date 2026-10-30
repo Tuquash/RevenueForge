@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101318">
+  <title>Sign In | RevenueForge</title>
+  <link rel="stylesheet" href="login.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth.js" defer></script>
+</head>
+<body>
+  <main class="login-layout">
+    <section class="login-brand">
+      <a class="brand" href="login.html">Revenue<span>Forge</span></a>
+      <p class="tagline">YOUR SALES. YOUR SYSTEM. YOUR GROWTH.</p>
+      <h1>Turn your leads<br>into <span>revenue.</span></h1>
+      <p class="description">
+        Manage customer relationships, track your sales pipeline,
+        and create follow-up messages from one workspace.
+      </p>
+      <div class="feature-list">
+        <p>✓ Organize your customer leads</p>
+        <p>✓ Track every sales opportunity</p>
+        <p>✓ Create personalized follow-ups</p>
+      </div>
+    </section>
+
+    <section class="login-card">
+      <p class="eyebrow">WELCOME BACK</p>
+      <h2>Access your workspace</h2>
+      <p class="subtext">Sign in or create an account to continue.</p>
+
+      <form id="auth-form">
+        <label for="auth-email">Email address</label>
+        <input
+          id="auth-email"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+
+        <label for="auth-password">Password</label>
+        <input
+          id="auth-password"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          minlength="6"
+          required
+        >
+
+        <button type="submit" id="sign-in-button">Sign In</button>
+        <button type="button" id="sign-up-button" class="secondary-button">
+          Create Account
+        </button>
+
+        <p id="auth-message" role="status" aria-live="polite"></p>
+      </form>
+
+      <p class="security-note">Your workspace is protected by account authentication.</p>
+    </section>
+  </main>
+</body>
+</html>
