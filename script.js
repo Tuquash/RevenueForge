@@ -45,7 +45,10 @@ function saveLeads() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
     return true;
   } catch {
-    showMessage("Could not save data in this browser. Check browser storage settings.", true);
+    showMessage(
+      "Could not save data. Check your browser storage settings.",
+      true
+    );
     return false;
   }
 }
@@ -76,10 +79,12 @@ function createCell(text) {
 
 function createActionButton(label, className, handler) {
   const button = document.createElement("button");
+
   button.type = "button";
   button.textContent = label;
   button.className = `action-button ${className || ""}`.trim();
   button.addEventListener("click", handler);
+
   return button;
 }
 
@@ -114,7 +119,9 @@ function renderLeads() {
     cell.className = "empty-state";
     row.appendChild(cell);
     table.appendChild(row);
+
     updateDashboard();
+    updateFollowUpLeads();
     return;
   }
 
@@ -130,6 +137,7 @@ function renderLeads() {
 
     badge.className = `status-badge status-${lead.status.toLowerCase()}`;
     badge.textContent = lead.status;
+
     statusCell.appendChild(badge);
     row.appendChild(statusCell);
 
@@ -140,7 +148,11 @@ function renderLeads() {
     );
 
     actionsCell.appendChild(
-      createActionButton("Delete", "delete-button", () => deleteLead(lead.id))
+      createActionButton(
+        "Delete",
+        "delete-button",
+        () => deleteLead(lead.id)
+      )
     );
 
     row.appendChild(actionsCell);
@@ -148,6 +160,7 @@ function renderLeads() {
   });
 
   updateDashboard();
+  updateFollowUpLeads();
 }
 
 function resetForm() {
@@ -172,6 +185,7 @@ function editLead(id) {
   formTitle.textContent = "Edit lead";
   saveButton.textContent = "Update Lead";
   cancelButton.hidden = false;
+
   showMessage("");
 
   document.getElementById("add-lead").scrollIntoView({
@@ -259,7 +273,12 @@ form.addEventListener("submit", event => {
 
   resetForm();
   renderLeads();
-  showMessage(editingId ? "Lead updated successfully." : "Lead added successfully.");
+
+  showMessage(
+    editingId
+      ? "Lead updated successfully."
+      : "Lead added successfully."
+  );
 });
 
 searchInput.addEventListener("input", renderLeads);
@@ -277,4 +296,116 @@ document.getElementById("add-lead-button").addEventListener("click", () => {
   fields.name.focus({ preventScroll: true });
 });
 
+// FOLLOW-UP MESSAGE GENERATOR
+
+const followUpLead = document.getElementById("follow-up-lead");
+const messageType = document.getElementById("message-type");
+const messageService = document.getElementById("message-service");
+const generatedMessage = document.getElementById("generated-message");
+const generateMessageButton = document.getElementById("generate-message");
+const copyMessageButton = document.getElementById("copy-message");
+const generatorFeedback = document.getElementById("generator-feedback");
+
+function updateFollowUpLeads() {
+  if (!followUpLead) return;
+
+  const previousSelection = followUpLead.value;
+
+  followUpLead.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select a lead";
+
+  followUpLead.appendChild(placeholder);
+
+  leads.forEach(lead => {
+    const option = document.createElement("option");
+
+    option.value = lead.id;
+    option.textContent = `${lead.name} — ${lead.business}`;
+
+    followUpLead.appendChild(option);
+  });
+
+  if (leads.some(lead => lead.id === previousSelection)) {
+    followUpLead.value = previousSelection;
+  }
+}
+
+generateMessageButton.addEventListener("click", () => {
+  const selectedLead = leads.find(
+    lead => lead.id === followUpLead.value
+  );
+
+  if (!selectedLead) {
+    generatorFeedback.textContent = "Please select a lead first.";
+    return;
+  }
+
+  const service =
+    messageService.value.trim() || selectedLead.business;
+
+  const firstName = selectedLead.name.trim().split(/\s+/)[0];
+  const type = messageType.value;
+
+  let message = "";
+
+  if (type === "first") {
+    message = `Hello ${firstName},
+
+I hope you're doing well. I'm reaching out regarding ${service}. I'd be happy to learn more about your needs and discuss how we might help.
+
+Would you be available for a brief conversation?
+
+Best regards`;
+  } else if (type === "followup") {
+    message = `Hello ${firstName},
+
+I'm following up on my previous message regarding ${service}. I understand you're busy, so I wanted to check whether this is something you'd still like to discuss.
+
+Please let me know if you have any questions.
+
+Best regards`;
+  } else if (type === "closing") {
+    message = `Hello ${firstName},
+
+Thank you for considering our ${service} service. I'd be glad to discuss the next steps and answer any remaining questions.
+
+Would you be ready to move forward, or is there anything else you'd like clarified first?
+
+Best regards`;
+  }
+
+  generatedMessage.value = message;
+  generatorFeedback.textContent =
+    "Message generated. Review it before sending.";
+});
+
+copyMessageButton.addEventListener("click", async () => {
+  const message = generatedMessage.value.trim();
+
+  if (!message) {
+    generatorFeedback.textContent = "Generate a message first.";
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(message);
+    generatorFeedback.textContent = "Message copied to clipboard.";
+  } catch {
+    generatedMessage.focus();
+    generatedMessage.select();
+
+    const copied = document.execCommand("copy");
+
+    generatorFeedback.textContent = copied
+      ? "Message copied to clipboard."
+      : "Copy failed. Select and copy the message manually.";
+  }
+});
+
+// INITIALIZE DASHBOARD
+
+updateFollowUpLeads();
 renderLeads();
