@@ -1,68 +1,101 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="RevenueForge lead management dashboard for small businesses">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="description"
+    content="RevenueForge helps you manage leads, track customer relationships, and generate follow-up messages."
+  >
+
   <title>RevenueForge | Lead Management</title>
+
   <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
+
 <body>
-  <header>
-    <a href="#home" class="brand">RevenueForge<span>.</span></a>
-    <nav>
-      <a href="#dashboard">Dashboard</a>
-      <a href="#leads">Leads</a>
-      <a href="#add-lead">Add Lead</a>
-    </nav>
+  <header class="site-header">
+    <div class="container header-content">
+      <a class="logo" href="#" aria-label="RevenueForge home">
+        Revenue<span>Forge</span>
+      </a>
+
+      <span class="header-label">LEAD MANAGEMENT</span>
+    </div>
   </header>
 
-  <main class="wrap" id="home">
+  <main class="container">
+    <!-- INTRODUCTION -->
     <section class="hero">
-      <p class="kicker">REVENUEFORGE WORKSPACE</p>
-      <h1>Turn business enquiries into opportunities.</h1>
-      <p class="lead">Manage potential customers, track conversations, and monitor conversions from one simple dashboard.</p>
+      <p class="eyebrow">YOUR SALES WORKSPACE</p>
+
+      <h1>Turn potential customers into revenue.</h1>
+
+      <p class="hero-description">
+        Organize your leads, track their progress, and create personalized
+        follow-up messages from one dashboard.
+      </p>
+
+      <button
+        type="button"
+        id="add-lead-button"
+        class="primary-button"
+      >
+        + Add New Lead
+      </button>
     </section>
 
-    <section class="section" id="dashboard">
-      <div class="section-heading">
-        <div>
-          <p class="kicker">OVERVIEW</p>
-          <h2>Your dashboard</h2>
-        </div>
-        <button class="btn" id="add-lead-button" type="button">+ Add Lead</button>
-      </div>
+    <!-- DASHBOARD STATISTICS -->
+    <section class="stats-grid" aria-label="Lead statistics">
+      <article class="stat-card">
+        <p class="stat-label">Total Leads</p>
+        <p class="stat-number" id="total-leads">0</p>
+      </article>
 
-      <div class="stats">
-        <article class="stat-card">
-          <p>Total Leads</p>
-          <h3 id="total-leads">0</h3>
-        </article>
-        <article class="stat-card">
-          <p>New Leads</p>
-          <h3 id="new-leads">0</h3>
-        </article>
-        <article class="stat-card">
-          <p>Contacted</p>
-          <h3 id="contacted-leads">0</h3>
-        </article>
-        <article class="stat-card">
-          <p>Converted</p>
-          <h3 id="converted-leads">0</h3>
-        </article>
-      </div>
+      <article class="stat-card">
+        <p class="stat-label">New Leads</p>
+        <p class="stat-number" id="new-leads">0</p>
+      </article>
+
+      <article class="stat-card">
+        <p class="stat-label">Contacted</p>
+        <p class="stat-number" id="contacted-leads">0</p>
+      </article>
+
+      <article class="stat-card">
+        <p class="stat-label">Converted</p>
+        <p class="stat-number" id="converted-leads">0</p>
+      </article>
     </section>
 
-    <section class="section" id="leads">
+    <!-- CUSTOMER LEADS TABLE -->
+    <section class="section" id="leads-section">
       <div class="section-heading">
         <div>
-          <p class="kicker">CUSTOMER MANAGEMENT</p>
-          <h2>Your leads</h2>
+          <p class="eyebrow">CUSTOMER PIPELINE</p>
+          <h2>Your Leads</h2>
         </div>
+
+        <button
+          type="button"
+          id="add-lead-button-secondary"
+          class="secondary-button"
+          onclick="document.getElementById('add-lead-button').click()"
+        >
+          + Add Lead
+        </button>
       </div>
 
       <div class="toolbar">
-        <input type="search" id="search-leads" placeholder="Search by name, email or business..." aria-label="Search leads">
+        <input
+          type="search"
+          id="search-leads"
+          placeholder="Search name, email, or business..."
+          aria-label="Search leads"
+        >
+
         <select id="filter-status" aria-label="Filter leads by status">
           <option value="All">All statuses</option>
           <option value="New">New</option>
@@ -71,97 +104,234 @@
         </select>
       </div>
 
-      <div class="table-container">
+      <div class="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Business / Need</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Business / Need</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
+
           <tbody id="leads-table">
             <tr>
-              <td colspan="5" class="empty-state">No leads yet. Add your first lead to get started.</td>
+              <td colspan="5" class="empty-state">
+                Loading leads...
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p class="storage-note">Your leads are stored in this browser on this device. They are not uploaded to a server.</p>
+
+      <p class="storage-note">
+        Your leads are saved in this browser on this device.
+      </p>
     </section>
-    <section class="section" id="follow-up">
-      <p class="kicker">SALES ASSISTANT</p>
-      <h2>Follow-Up Message Generator</h2>
-      <p class="lead">Create personalized messages to follow up with potential customers.</p>
 
-      <div class="form-section">
-        <label for="follow-up-lead">Choose a lead</label>
-        <select id="follow-up-lead">
-          <option value="">Select a lead</option>
-        </select>
+    <!-- FOLLOW-UP MESSAGE GENERATOR -->
+    <section class="section form-section" id="message-generator">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">CUSTOMER COMMUNICATION</p>
+          <h2>Follow-Up Message Generator</h2>
+        </div>
+      </div>
 
-        <label for="message-type">Message type</label>
-        <select id="message-type">
-          <option value="first">First contact</option>
-          <option value="followup">Follow-up</option>
-          <option value="closing">Closing a deal</option>
-        </select>
+      <p class="section-description">
+        Create personalized messages to follow up with potential customers.
+        Add a lead first, then select that lead below.
+      </p>
 
-        <label for="message-service">Product or service offered</label>
-        <input id="message-service" type="text" placeholder="e.g. Website design">
+      <div class="generator-grid">
+        <div class="form-group">
+          <label for="follow-up-lead">Choose a lead</label>
 
-        <button class="btn" id="generate-message" type="button">
+          <select id="follow-up-lead" required>
+            <option value="">Select a lead</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="message-type">Message type</label>
+
+          <select id="message-type">
+            <option value="first">First contact</option>
+            <option value="followup">Follow-up</option>
+            <option value="closing">Closing a deal</option>
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="message-service">
+            Product or service offered
+          </label>
+
+          <input
+            type="text"
+            id="message-service"
+            placeholder="e.g. Website design, marketing, consulting"
+          >
+
+          <small>
+            Leave this blank to use the business or customer need saved
+            with the selected lead.
+          </small>
+        </div>
+      </div>
+
+      <div class="generator-actions">
+        <button
+          type="button"
+          id="generate-message"
+          class="primary-button"
+        >
           Generate Message
         </button>
+      </div>
 
+      <div class="form-group message-output">
         <label for="generated-message">Your message</label>
-        <textarea id="generated-message" rows="8" placeholder="Your personalized message will appear here."></textarea>
 
-        <button class="btn secondary" id="copy-message" type="button">
+        <textarea
+          id="generated-message"
+          rows="9"
+          placeholder="Your personalized message will appear here..."
+        ></textarea>
+      </div>
+
+      <div class="generator-actions">
+        <button
+          type="button"
+          id="copy-message"
+          class="secondary-button"
+        >
           Copy Message
         </button>
 
-        <p id="generator-feedback" role="status" aria-live="polite"></p>
+        <p
+          id="generator-feedback"
+          class="feedback"
+          role="status"
+          aria-live="polite"
+        ></p>
       </div>
+
+      <p class="storage-note">
+        Messages are generated from built-in templates. Review each message
+        before sending it to a customer.
+      </p>
     </section>
+
+    <!-- ADD / EDIT LEAD FORM -->
     <section class="section form-section" id="add-lead">
-      <p class="kicker">CUSTOMER DETAILS</p>
-      <h2 id="form-title">Add a new lead</h2>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">CUSTOMER DETAILS</p>
+          <h2 id="form-title">Add a new lead</h2>
+        </div>
+      </div>
 
       <form id="lead-form">
         <input type="hidden" id="lead-id">
 
-        <label for="lead-name">Full name</label>
-        <input id="lead-name" type="text" placeholder="e.g. Alex Johnson" required maxlength="100">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="lead-name">Full name</label>
 
-        <label for="lead-email">Email address</label>
-        <input id="lead-email" type="email" placeholder="e.g. alex@example.com" required maxlength="150">
+            <input
+              type="text"
+              id="lead-name"
+              placeholder="Customer's full name"
+              autocomplete="name"
+              required
+            >
+          </div>
 
-        <label for="lead-business">Business or customer need</label>
-        <input id="lead-business" type="text" placeholder="e.g. Website design" required maxlength="200">
+          <div class="form-group">
+            <label for="lead-email">Email address</label>
 
-        <label for="lead-status">Lead status</label>
-        <select id="lead-status">
-          <option value="New">New</option>
-          <option value="Contacted">Contacted</option>
-          <option value="Converted">Converted</option>
-        </select>
+            <input
+              type="email"
+              id="lead-email"
+              placeholder="customer@example.com"
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="lead-business">
+              Business or customer need
+            </label>
+
+            <input
+              type="text"
+              id="lead-business"
+              placeholder="e.g. Needs a business website"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="lead-status">Lead status</label>
+
+            <select id="lead-status" required>
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Converted">Converted</option>
+            </select>
+          </div>
+        </div>
 
         <div class="form-actions">
-          <button class="btn" type="submit" id="save-button">Save Lead</button>
-          <button class="btn secondary" type="button" id="cancel-edit" hidden>Cancel</button>
+          <button
+            type="submit"
+            id="save-button"
+            class="primary-button"
+          >
+            Save Lead
+          </button>
+
+          <button
+            type="button"
+            id="cancel-edit"
+            class="secondary-button"
+            hidden
+          >
+            Cancel Edit
+          </button>
         </div>
-        <p id="form-message" role="status" aria-live="polite"></p>
+
+        <p
+          id="form-message"
+          class="feedback"
+          role="status"
+          aria-live="polite"
+        ></p>
       </form>
+    </section>
+
+    <!-- PROTOTYPE NOTICE -->
+    <section class="prototype-notice">
+      <strong>Prototype notice</strong>
+      <p>
+        RevenueForge currently stores leads locally in your browser.
+        The dashboard is not connected to a shared database, and the
+        message generator does not use an AI API.
+      </p>
     </section>
   </main>
 
-  <footer class="wrap">
-    © <span id="year"></span> RevenueForge · Lead Management Prototype
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        &copy; <span id="year">2026</span> RevenueForge
+        &middot; Lead Management Prototype
+      </p>
+    </div>
   </footer>
-
-  <script src="script.js"></script>
 </body>
 </html>
