@@ -1,4 +1,3 @@
-```javascript
 "use strict";
 
 // ==========================================
@@ -567,4 +566,3 @@ updateFollowUpLeads();
 renderLeads();
 
 console.log("RevenueForge loaded successfully.");
-```
