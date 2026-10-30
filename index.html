@@ -91,7 +91,41 @@
       </div>
       <p class="storage-note">Your leads are stored in this browser on this device. They are not uploaded to a server.</p>
     </section>
+    <section class="section" id="follow-up">
+      <p class="kicker">SALES ASSISTANT</p>
+      <h2>Follow-Up Message Generator</h2>
+      <p class="lead">Create personalized messages to follow up with potential customers.</p>
 
+      <div class="form-section">
+        <label for="follow-up-lead">Choose a lead</label>
+        <select id="follow-up-lead">
+          <option value="">Select a lead</option>
+        </select>
+
+        <label for="message-type">Message type</label>
+        <select id="message-type">
+          <option value="first">First contact</option>
+          <option value="followup">Follow-up</option>
+          <option value="closing">Closing a deal</option>
+        </select>
+
+        <label for="message-service">Product or service offered</label>
+        <input id="message-service" type="text" placeholder="e.g. Website design">
+
+        <button class="btn" id="generate-message" type="button">
+          Generate Message
+        </button>
+
+        <label for="generated-message">Your message</label>
+        <textarea id="generated-message" rows="8" placeholder="Your personalized message will appear here."></textarea>
+
+        <button class="btn secondary" id="copy-message" type="button">
+          Copy Message
+        </button>
+
+        <p id="generator-feedback" role="status" aria-live="polite"></p>
+      </div>
+    </section>
     <section class="section form-section" id="add-lead">
       <p class="kicker">CUSTOMER DETAILS</p>
       <h2 id="form-title">Add a new lead</h2>
