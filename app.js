@@ -1,13 +1,6 @@
-
 (function () {
-  const url =
-    typeof SUPABASE_URL !== "undefined" ? SUPABASE_URL :
-    window.SUPABASE_URL || window.supabaseUrl;
-
-  const key =
-    typeof SUPABASE_ANON_KEY !== "undefined" ? SUPABASE_ANON_KEY :
-    typeof SUPABASE_KEY !== "undefined" ? SUPABASE_KEY :
-    window.SUPABASE_ANON_KEY || window.SUPABASE_KEY || window.supabaseKey;
+  const url = window.REVENUEFORGE_SUPABASE_URL;
+  const key = window.REVENUEFORGE_SUPABASE_KEY;
 
   if (!url || !key || !window.supabase) {
     console.error("RevenueForge: Supabase configuration missing.");
