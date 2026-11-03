@@ -1,352 +1,143 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <meta
-    name="description"
-    content="RevenueForge helps you manage leads, track customer relationships, and generate follow-up messages."
-  >
-
-  <title>RevenueForge | Lead Management</title>
-
-  <link rel="stylesheet" href="style.css">
-
+  <title>Dashboard | RevenueForge</title>
+  <link rel="stylesheet" href="app.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="cloud.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
+<body data-page="dashboard">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="brand">Revenue<span>Forge</span></div>
 
-<body>
-  <header class="site-header">
-    <div class="container header-content">
-      <a class="logo" href="#" aria-label="RevenueForge home">
-        Revenue<span>Forge</span>
-      </a>
+      <div class="nav-label">WORKSPACE</div>
+      <nav>
+        <a class="nav-link active" href="index.html"><span class="nav-icon">▦</span>Dashboard</a>
+        <a class="nav-link" href="leads.html"><span class="nav-icon">◉</span>Leads</a>
+        <a class="nav-link" href="add-lead.html"><span class="nav-icon">＋</span>Add Lead</a>
+        <a class="nav-link" href="follow-ups.html"><span class="nav-icon">✉</span>Follow-ups</a>
+        <a class="nav-link" href="reports.html"><span class="nav-icon">▤</span>Reports</a>
+      </nav>
 
-      <div class="header-actions">
-        <span class="header-label">LEAD MANAGEMENT</span>
-        <button
-          type="button"
-          id="sign-out-button"
-          class="secondary-button"
-          hidden
-        >
-          Sign Out
-        </button>
+      <div class="sidebar-bottom">
+        <a class="nav-link" href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
+        <button class="nav-link" id="sign-out" style="width:100%;border:0;background:transparent;text-align:left;"><span class="nav-icon">↪</span>Sign out</button>
       </div>
-    </div>
-  </header>
+    </aside>
 
-  <main class="container">
-
-    <!-- INTRODUCTION -->
-    <section class="hero">
-      <p class="eyebrow">YOUR SALES WORKSPACE</p>
-
-      <h1>Turn potential customers into revenue.</h1>
-
-      <p class="hero-description">
-        Organize your leads, track their progress, and create personalized
-        follow-up messages from one dashboard.
-      </p>
-
-      <button
-        type="button"
-        id="add-lead-button"
-        class="primary-button"
-      >
-        + Add New Lead
-      </button>
-    </section>
-
-    <!-- DASHBOARD STATISTICS -->
-    <section class="stats-grid" aria-label="Lead statistics">
-      <article class="stat-card">
-        <p class="stat-label">Total Leads</p>
-        <p class="stat-number" id="total-leads">0</p>
-      </article>
-
-      <article class="stat-card">
-        <p class="stat-label">New Leads</p>
-        <p class="stat-number" id="new-leads">0</p>
-      </article>
-
-      <article class="stat-card">
-        <p class="stat-label">Contacted</p>
-        <p class="stat-number" id="contacted-leads">0</p>
-      </article>
-
-      <article class="stat-card">
-        <p class="stat-label">Converted</p>
-        <p class="stat-number" id="converted-leads">0</p>
-      </article>
-    </section>
-
-    <!-- CUSTOMER LEADS TABLE -->
-    <section class="section" id="leads-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">CUSTOMER PIPELINE</p>
-          <h2>Your Leads</h2>
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-right">
+          <span id="user-email" class="muted">Loading account...</span>
+          <div class="user-avatar">R</div>
         </div>
+      </header>
 
-        <button
-          type="button"
-          id="add-lead-button-secondary"
-          class="secondary-button"
-          onclick="document.getElementById('add-lead-button').click()"
-        >
-          + Add Lead
-        </button>
-      </div>
+      <div class="content">
+        <section class="page-heading">
+          <div>
+            <h1>Dashboard overview</h1>
+            <p>Track your leads and monitor your sales pipeline.</p>
+          </div>
+          <a class="button button-primary" href="add-lead.html">＋ Add New Lead</a>
+        </section>
 
-      <div class="toolbar">
-        <input
-          type="search"
-          id="search-leads"
-          placeholder="Search name, email, or business..."
-          aria-label="Search leads"
-        >
-
-        <select id="filter-status" aria-label="Filter leads by status">
-          <option value="All">All statuses</option>
-          <option value="New">New</option>
-          <option value="Contacted">Contacted</option>
-          <option value="Converted">Converted</option>
-        </select>
-      </div>
-
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Email</th>
-              <th scope="col">Business / Need</th>
-              <th scope="col">Status</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody id="leads-table">
-            <tr>
-              <td colspan="5" class="empty-state">
-                Loading leads...
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p class="storage-note">
-        Your leads are stored in your connected database.
-      </p>
-    </section>
-
-    <!-- FOLLOW-UP MESSAGE GENERATOR -->
-    <section class="section form-section" id="message-generator">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">CUSTOMER COMMUNICATION</p>
-          <h2>Follow-Up Message Generator</h2>
-        </div>
-      </div>
-
-      <p class="section-description">
-        Create personalized messages to follow up with potential customers.
-        Add a lead first, then select that lead below.
-      </p>
-
-      <div class="generator-grid">
-        <div class="form-group">
-          <label for="follow-up-lead">Choose a lead</label>
-
-          <select id="follow-up-lead" required>
-            <option value="">Select a lead</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="message-type">Message type</label>
-
-          <select id="message-type">
-            <option value="first">First contact</option>
-            <option value="followup">Follow-up</option>
-            <option value="closing">Closing a deal</option>
-          </select>
-        </div>
-
-        <div class="form-group full-width">
-          <label for="message-service">
-            Product or service offered
-          </label>
-
-          <input
-            type="text"
-            id="message-service"
-            placeholder="e.g. Website design, marketing, consulting"
-          >
-
-          <small>
-            Leave this blank to use the business or customer need saved
-            with the selected lead.
-          </small>
-        </div>
-      </div>
-
-      <div class="generator-actions">
-        <button
-          type="button"
-          id="generate-message"
-          class="primary-button"
-        >
-          Generate Message
-        </button>
-      </div>
-
-      <div class="form-group message-output">
-        <label for="generated-message">Your message</label>
-
-        <textarea
-          id="generated-message"
-          rows="9"
-          placeholder="Your personalized message will appear here..."
-        ></textarea>
-      </div>
-
-      <div class="generator-actions">
-        <button
-          type="button"
-          id="copy-message"
-          class="secondary-button"
-        >
-          Copy Message
-        </button>
-
-        <p
-          id="generator-feedback"
-          class="feedback"
-          role="status"
-          aria-live="polite"
-        ></p>
-      </div>
-
-      <p class="storage-note">
-        Messages are generated from built-in templates. Review each message
-        before sending it to a customer.
-      </p>
-    </section>
-
-    <!-- ADD / EDIT LEAD FORM -->
-    <section class="section form-section" id="add-lead">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">CUSTOMER DETAILS</p>
-          <h2 id="form-title">Add a new lead</h2>
-        </div>
-      </div>
-
-      <form id="lead-form">
-        <input type="hidden" id="lead-id">
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="lead-name">Full name</label>
-
-            <input
-              type="text"
-              id="lead-name"
-              placeholder="Customer's full name"
-              autocomplete="name"
-              required
-            >
+        <section class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Total Leads</span>
+              <span class="stat-icon">◉</span>
+            </div>
+            <div class="stat-number" id="total-leads">0</div>
+            <div class="stat-note">All recorded leads</div>
           </div>
 
-          <div class="form-group">
-            <label for="lead-email">Email address</label>
-
-            <input
-              type="email"
-              id="lead-email"
-              placeholder="customer@example.com"
-              autocomplete="email"
-              required
-            >
+          <div class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">New Leads</span>
+              <span class="stat-icon">＋</span>
+            </div>
+            <div class="stat-number" id="new-leads">0</div>
+            <div class="stat-note">Awaiting contact</div>
           </div>
 
-          <div class="form-group">
-            <label for="lead-business">
-              Business or customer need
-            </label>
-
-            <input
-              type="text"
-              id="lead-business"
-              placeholder="e.g. Needs a business website"
-              required
-            >
+          <div class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Contacted</span>
+              <span class="stat-icon">✉</span>
+            </div>
+            <div class="stat-number" id="contacted-leads">0</div>
+            <div class="stat-note">Leads already contacted</div>
           </div>
 
-          <div class="form-group">
-            <label for="lead-status">Lead status</label>
-
-            <select id="lead-status" required>
-              <option value="New">New</option>
-              <option value="Contacted">Contacted</option>
-              <option value="Converted">Converted</option>
-            </select>
+          <div class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Converted</span>
+              <span class="stat-icon">✓</span>
+            </div>
+            <div class="stat-number" id="converted-leads">0</div>
+            <div class="stat-note">Successful conversions</div>
           </div>
-        </div>
+        </section>
 
-        <div class="form-actions">
-          <button
-            type="submit"
-            id="save-button"
-            class="primary-button"
-          >
-            Save Lead
-          </button>
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Recent leads</h2>
+            <a class="button button-secondary" href="leads.html">View all leads →</a>
+          </div>
 
-          <button
-            type="button"
-            id="cancel-edit"
-            class="secondary-button"
-            hidden
-          >
-            Cancel Edit
-          </button>
-        </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                  <th>Date added</th>
+                </tr>
+              </thead>
+              <tbody id="recent-leads">
+                <tr><td colspan="5" class="empty-state">Loading leads...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-        <p
-          id="form-message"
-          class="feedback"
-          role="status"
-          aria-live="polite"
-        ></p>
-      </form>
-    </section>
-
-    <!-- PROTOTYPE NOTICE -->
-    <section class="prototype-notice">
-      <strong>Prototype notice</strong>
-      <p>
-        RevenueForge uses Supabase for cloud data storage.
-        The message generator uses built-in templates and does not
-        currently connect to an AI API.
-      </p>
-    </section>
-
-  </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <p>
-        &copy; <span id="year">2026</span> RevenueForge
-        &middot; Lead Management
-      </p>
-    </div>
-  </footer>
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Sales pipeline</h2>
+            <span class="muted">Lead distribution</span>
+          </div>
+          <div class="panel-body">
+            <div class="card-grid">
+              <div>
+                <div class="stat-label">New leads</div>
+                <div class="stat-number" id="pipeline-new">0</div>
+              </div>
+              <div>
+                <div class="stat-label">Contacted leads</div>
+                <div class="stat-number" id="pipeline-contacted">0</div>
+              </div>
+              <div>
+                <div class="stat-label">Converted leads</div>
+                <div class="stat-number" id="pipeline-converted">0</div>
+              </div>
+              <div>
+                <div class="stat-label">Conversion rate</div>
+                <div class="stat-number" id="conversion-rate">0%</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
 </body>
 </html>
