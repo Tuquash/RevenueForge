@@ -100,6 +100,10 @@
   // ==========================================
 
   async function initialise() {
+    // Attach page events before loading database records.
+    // Navigation and sign-out remain available if loading fails.
+    setupPage();
+
     try {
       const { data, error } = await db.auth.getSession();
 
@@ -116,13 +120,15 @@
       setText("settings-email", currentUser.email || "Account");
 
       await loadLeads();
-      setupPage();
+
+      // Load edit form details only after leads are available.
+      setupAddLead();
 
     } catch (error) {
       console.error("RevenueForge initialization error:", error);
 
       showMessage(
-        "Unable to load your workspace. Please refresh and try again.",
+        "Unable to load your workspace. Check your connection and refresh the page.",
         true
       );
     }
@@ -216,7 +222,7 @@
     }
 
     if (id) {
-      const { error } = await db
+      const { data, error } = await db
         .from("leads")
         .update({
           name: lead.name,
@@ -225,9 +231,17 @@
           status: lead.status
         })
         .eq("id", id)
-        .eq("user_id", currentUser.id);
+        .eq("user_id", currentUser.id)
+        .select("id")
+        .maybeSingle();
 
       if (error) throw error;
+
+      if (!data) {
+        throw new Error(
+          "Lead was not found or you do not have permission to update it."
+        );
+      }
 
     } else {
       const { error } = await db
@@ -256,13 +270,21 @@
     if (!confirmed) return;
 
     try {
-      const { error } = await db
+      const { data, error } = await db
         .from("leads")
         .delete()
         .eq("id", id)
-        .eq("user_id", currentUser.id);
+        .eq("user_id", currentUser.id)
+        .select("id")
+        .maybeSingle();
 
       if (error) throw error;
+
+      if (!data) {
+        throw new Error(
+          "Lead was not found or you do not have permission to delete it."
+        );
+      }
 
       leads = leads.filter(
         (item) => String(item.id) !== String(id)
@@ -756,8 +778,6 @@ Best regards`
     $("sign-out")?.addEventListener("click", signOut);
 
     $("settings-sign-out")?.addEventListener("click", signOut);
-
-    setupAddLead();
   }
 
   // ==========================================
