@@ -53,8 +53,8 @@ Row Level Security (RLS) policies restrict users to their own lead records.
 Example configuration:
 
 ```javascript
-window.REVENUEFORGE_SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-window.REVENUEFORGE_SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+window.REVENUEFORGE_SUPABASE_URL = "[YOUR_SUPABASE_PROJECT_URL](https://cussolbbbvlvzptsaxmi.supabase.co)";
+window.REVENUEFORGE_SUPABASE_KEY = "sb_publishable_OjIDVXfIuPENkmSk6SW4zA_SIabQvtj";
 ```
 
 Never place a Supabase service-role key in frontend code.
