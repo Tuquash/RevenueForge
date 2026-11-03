@@ -4,31 +4,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage and track your sales prospects with RevenueForge.">
   <title>Leads | RevenueForge</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="app.js" defer></script>
 </head>
+
 <body data-page="leads">
   <div class="app-layout">
+
     <aside class="sidebar">
       <div class="brand">Revenue<span>Forge</span></div>
+
       <div class="nav-label">WORKSPACE</div>
-      <nav>
-        <a class="nav-link" href="index.html"><span class="nav-icon">▦</span>Dashboard</a>
-        <a class="nav-link active" href="leads.html"><span class="nav-icon">◉</span>Leads</a>
-        <a class="nav-link" href="add-lead.html"><span class="nav-icon">＋</span>Add Lead</a>
-        <a class="nav-link" href="follow-ups.html"><span class="nav-icon">✉</span>Follow-ups</a>
-        <a class="nav-link" href="reports.html"><span class="nav-icon">▤</span>Reports</a>
+
+      <nav aria-label="Main navigation">
+        <a class="nav-link" href="index.html">
+          <span class="nav-icon">▦</span>Dashboard
+        </a>
+        <a class="nav-link active" href="leads.html" aria-current="page">
+          <span class="nav-icon">◉</span>Leads
+        </a>
+        <a class="nav-link" href="add-lead.html">
+          <span class="nav-icon">＋</span>Add Lead
+        </a>
+        <a class="nav-link" href="follow-ups.html">
+          <span class="nav-icon">✉</span>Follow-ups
+        </a>
+        <a class="nav-link" href="reports.html">
+          <span class="nav-icon">▤</span>Reports
+        </a>
       </nav>
+
       <div class="sidebar-bottom">
-        <a class="nav-link" href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
-        <button class="nav-link" id="sign-out" style="width:100%;border:0;background:transparent;text-align:left;"><span class="nav-icon">↪</span>Sign out</button>
+        <a class="nav-link" href="settings.html">
+          <span class="nav-icon">⚙</span>Settings
+        </a>
+        <button class="nav-link" id="sign-out" type="button"
+          style="width:100%;border:0;background:transparent;text-align:left;">
+          <span class="nav-icon">↪</span>Sign out
+        </button>
       </div>
     </aside>
 
     <main class="main-area">
+
       <header class="topbar">
         <div class="topbar-title">Lead Management</div>
         <div class="topbar-right">
@@ -38,25 +65,47 @@
       </header>
 
       <div class="content">
+
         <section class="page-heading">
           <div>
             <h1>All Leads</h1>
-            <p>Manage, search and track your sales prospects.</p>
+            <p>Organise your prospects, monitor their status and manage your pipeline.</p>
           </div>
-          <a class="button button-primary" href="add-lead.html">＋ Add New Lead</a>
+
+          <a class="button button-primary" href="add-lead.html">
+            + Add New Lead
+          </a>
         </section>
 
         <section class="panel">
           <div class="panel-header">
-            <h2>Your leads</h2>
+            <div>
+              <h2>Your Leads</h2>
+              <p class="muted">Search and manage your saved prospects.</p>
+            </div>
             <span class="muted" id="lead-count">0 leads</span>
           </div>
 
           <div class="panel-body">
-            <div id="page-message" class="feedback" role="status" aria-live="polite"></div>
+
+            <div id="page-message" class="feedback"
+              role="status" aria-live="polite"></div>
+
             <div class="toolbar">
-              <input class="field" id="search-leads" type="search" placeholder="Search by name, email or service...">
-              <select class="field" id="filter-status" style="max-width:190px;">
+              <input
+                class="field"
+                id="search-leads"
+                type="search"
+                placeholder="Search by name, email or service..."
+                aria-label="Search leads"
+              >
+
+              <select
+                class="field"
+                id="filter-status"
+                style="max-width:190px;"
+                aria-label="Filter leads by status"
+              >
                 <option value="">All statuses</option>
                 <option value="New">New</option>
                 <option value="Contacted">Contacted</option>
@@ -68,21 +117,28 @@
               <table>
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Service</th>
-                    <th>Status</th>
-                    <th>Date added</th>
-                    <th>Actions</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Service</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Date Added</th>
+                    <th scope="col">Actions</th>
                   </tr>
                 </thead>
+
                 <tbody id="leads-list">
-                  <tr><td colspan="6" class="empty-state">Loading leads...</td></tr>
+                  <tr>
+                    <td colspan="6" class="empty-state">
+                      Loading leads...
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
+
           </div>
         </section>
+
       </div>
     </main>
   </div>
