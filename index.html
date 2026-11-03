@@ -1,143 +1,310 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="RevenueForge lead management dashboard. Track prospects, manage your sales pipeline and monitor conversions.">
+
   <title>Dashboard | RevenueForge</title>
+
   <link rel="stylesheet" href="app.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="app.js" defer></script>
 </head>
+
 <body data-page="dashboard">
+
   <div class="app-layout">
+
+    <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="brand">Revenue<span>Forge</span></div>
+
+      <div class="brand">
+        Revenue<span>Forge</span>
+      </div>
 
       <div class="nav-label">WORKSPACE</div>
-      <nav>
-        <a class="nav-link active" href="index.html"><span class="nav-icon">▦</span>Dashboard</a>
-        <a class="nav-link" href="leads.html"><span class="nav-icon">◉</span>Leads</a>
-        <a class="nav-link" href="add-lead.html"><span class="nav-icon">＋</span>Add Lead</a>
-        <a class="nav-link" href="follow-ups.html"><span class="nav-icon">✉</span>Follow-ups</a>
-        <a class="nav-link" href="reports.html"><span class="nav-icon">▤</span>Reports</a>
+
+      <nav aria-label="Main navigation">
+
+        <a class="nav-link active" href="index.html" aria-current="page">
+          <span class="nav-icon">▦</span>
+          Dashboard
+        </a>
+
+        <a class="nav-link" href="leads.html">
+          <span class="nav-icon">◉</span>
+          Leads
+        </a>
+
+        <a class="nav-link" href="add-lead.html">
+          <span class="nav-icon">＋</span>
+          Add Lead
+        </a>
+
+        <a class="nav-link" href="follow-ups.html">
+          <span class="nav-icon">✉</span>
+          Follow-ups
+        </a>
+
+        <a class="nav-link" href="reports.html">
+          <span class="nav-icon">▤</span>
+          Reports
+        </a>
+
       </nav>
 
       <div class="sidebar-bottom">
-        <a class="nav-link" href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
-        <button class="nav-link" id="sign-out" style="width:100%;border:0;background:transparent;text-align:left;"><span class="nav-icon">↪</span>Sign out</button>
+
+        <a class="nav-link" href="settings.html">
+          <span class="nav-icon">⚙</span>
+          Settings
+        </a>
+
+        <button
+          class="nav-link"
+          id="sign-out"
+          type="button"
+          style="width:100%;border:0;background:transparent;text-align:left;"
+        >
+          <span class="nav-icon">↪</span>
+          Sign out
+        </button>
+
       </div>
+
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="main-area">
+
+      <!-- TOP BAR -->
       <header class="topbar">
-        <div class="topbar-title">Dashboard</div>
-        <div class="topbar-right">
-          <span id="user-email" class="muted">Loading account...</span>
-          <div class="user-avatar">R</div>
+
+        <div class="topbar-title">
+          Dashboard
         </div>
+
+        <div class="topbar-right">
+
+          <span id="user-email" class="muted">
+            Loading account...
+          </span>
+
+          <div class="user-avatar" aria-label="RevenueForge account">
+            R
+          </div>
+
+        </div>
+
       </header>
 
       <div class="content">
+
+        <!-- PAGE INTRODUCTION -->
         <section class="page-heading">
+
           <div>
-            <h1>Dashboard overview</h1>
-            <p>Track your leads and monitor your sales pipeline.</p>
+            <h1>Dashboard Overview</h1>
+
+            <p>
+              Monitor your leads, track your sales pipeline and measure conversions.
+            </p>
           </div>
-          <a class="button button-primary" href="add-lead.html">＋ Add New Lead</a>
+
+          <a class="button button-primary" href="add-lead.html">
+            ＋ Add New Lead
+          </a>
+
         </section>
 
-        <section class="stats-grid">
-          <div class="stat-card">
+        <!-- STATISTICS -->
+        <section class="stats-grid" aria-label="Lead statistics">
+
+          <article class="stat-card">
+
             <div class="stat-top">
               <span class="stat-label">Total Leads</span>
               <span class="stat-icon">◉</span>
             </div>
-            <div class="stat-number" id="total-leads">0</div>
-            <div class="stat-note">All recorded leads</div>
-          </div>
 
-          <div class="stat-card">
+            <div class="stat-number" id="total-leads">
+              0
+            </div>
+
+            <div class="stat-note">
+              All recorded leads
+            </div>
+
+          </article>
+
+          <article class="stat-card">
+
             <div class="stat-top">
               <span class="stat-label">New Leads</span>
               <span class="stat-icon">＋</span>
             </div>
-            <div class="stat-number" id="new-leads">0</div>
-            <div class="stat-note">Awaiting contact</div>
-          </div>
 
-          <div class="stat-card">
+            <div class="stat-number" id="new-leads">
+              0
+            </div>
+
+            <div class="stat-note">
+              Awaiting contact
+            </div>
+
+          </article>
+
+          <article class="stat-card">
+
             <div class="stat-top">
               <span class="stat-label">Contacted</span>
               <span class="stat-icon">✉</span>
             </div>
-            <div class="stat-number" id="contacted-leads">0</div>
-            <div class="stat-note">Leads already contacted</div>
-          </div>
 
-          <div class="stat-card">
+            <div class="stat-number" id="contacted-leads">
+              0
+            </div>
+
+            <div class="stat-note">
+              Leads already contacted
+            </div>
+
+          </article>
+
+          <article class="stat-card">
+
             <div class="stat-top">
               <span class="stat-label">Converted</span>
               <span class="stat-icon">✓</span>
             </div>
-            <div class="stat-number" id="converted-leads">0</div>
-            <div class="stat-note">Successful conversions</div>
-          </div>
+
+            <div class="stat-number" id="converted-leads">
+              0
+            </div>
+
+            <div class="stat-note">
+              Successful conversions
+            </div>
+
+          </article>
+
         </section>
 
+        <!-- LATEST LEADS -->
         <section class="panel">
+
           <div class="panel-header">
-           <h2>Recent Activity</h2>
-            <a class="button button-secondary" href="leads.html">View all leads →</a>
+
+            <h2>Latest Leads</h2>
+
+            <a class="button button-secondary" href="leads.html">
+              View All Leads →
+            </a>
+
           </div>
 
           <div class="table-wrap">
+
             <table>
+
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Service</th>
-                  <th>Status</th>
-                  <th>Date added</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Service</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Date Added</th>
                 </tr>
               </thead>
+
               <tbody id="recent-leads">
-                <tr><td colspan="5" class="empty-state">Loading leads...</td></tr>
+
+                <tr>
+                  <td colspan="5" class="empty-state">
+                    Loading leads...
+                  </td>
+                </tr>
+
               </tbody>
+
             </table>
+
           </div>
+
         </section>
 
+        <!-- SALES PIPELINE -->
         <section class="panel">
+
           <div class="panel-header">
-            <h2>Sales pipeline</h2>
-            <span class="muted">Lead distribution</span>
+
+            <h2>Sales Pipeline</h2>
+
+            <span class="muted">
+              Lead distribution
+            </span>
+
           </div>
+
           <div class="panel-body">
+
             <div class="card-grid">
+
               <div>
-                <div class="stat-label">New leads</div>
-                <div class="stat-number" id="pipeline-new">0</div>
+                <div class="stat-label">
+                  New Leads
+                </div>
+
+                <div class="stat-number" id="pipeline-new">
+                  0
+                </div>
               </div>
+
               <div>
-                <div class="stat-label">Contacted leads</div>
-                <div class="stat-number" id="pipeline-contacted">0</div>
+                <div class="stat-label">
+                  Contacted Leads
+                </div>
+
+                <div class="stat-number" id="pipeline-contacted">
+                  0
+                </div>
               </div>
+
               <div>
-                <div class="stat-label">Converted leads</div>
-                <div class="stat-number" id="pipeline-converted">0</div>
+                <div class="stat-label">
+                  Converted Leads
+                </div>
+
+                <div class="stat-number" id="pipeline-converted">
+                  0
+                </div>
               </div>
+
               <div>
-                <div class="stat-label">Conversion rate</div>
-                <div class="stat-number" id="conversion-rate">0%</div>
+                <div class="stat-label">
+                  Conversion Rate
+                </div>
+
+                <div class="stat-number" id="conversion-rate">
+                  0%
+                </div>
               </div>
+
             </div>
+
           </div>
+
         </section>
+
       </div>
+
     </main>
+
   </div>
+
 </body>
 </html>
