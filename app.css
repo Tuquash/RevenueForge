@@ -471,9 +471,23 @@ tbody tr:hover {
     flex-wrap: wrap;
   }
 
-  .nav-label,
-  .sidebar-bottom {
+  /* Keep section labels hidden, but show Settings and Sign out */
+  .nav-label {
     display: none;
+  }
+
+  .sidebar-bottom {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+
+  .sidebar-bottom .nav-link {
+    flex: 1;
+    justify-content: center;
+    width: auto !important;
   }
 
   .nav-link {
