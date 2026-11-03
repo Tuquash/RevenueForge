@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Lead | RevenueForge</title>
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body data-page="add-lead">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="brand">Revenue<span>Forge</span></div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav>
+        <a class="nav-link" href="index.html"><span class="nav-icon">▦</span>Dashboard</a>
+        <a class="nav-link" href="leads.html"><span class="nav-icon">◉</span>Leads</a>
+        <a class="nav-link active" href="add-lead.html"><span class="nav-icon">＋</span>Add Lead</a>
+        <a class="nav-link" href="follow-ups.html"><span class="nav-icon">✉</span>Follow-ups</a>
+        <a class="nav-link" href="reports.html"><span class="nav-icon">▤</span>Reports</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <a class="nav-link" href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
+        <button class="nav-link" id="sign-out" style="width:100%;border:0;background:transparent;text-align:left;"><span class="nav-icon">↪</span>Sign out</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-title">Lead Management</div>
+        <div class="topbar-right">
+          <span id="user-email" class="muted">Loading account...</span>
+          <div class="user-avatar">R</div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="page-heading">
+          <div>
+            <h1 id="form-title">Add New Lead</h1>
+            <p id="form-description">Enter the details of a new potential customer.</p>
+          </div>
+          <a href="leads.html" class="button button-secondary">← Back to Leads</a>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Lead Information</h2>
+            <span class="muted">All fields required</span>
+          </div>
+
+          <div class="panel-body">
+            <form id="lead-form">
+              <input type="hidden" id="lead-id">
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="lead-name">Full Name</label>
+                  <input class="field" type="text" id="lead-name" placeholder="e.g. John Smith" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="lead-email">Email Address</label>
+                  <input class="field" type="email" id="lead-email" placeholder="name@example.com" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="lead-business">Service / Business</label>
+                  <input class="field" type="text" id="lead-business" placeholder="e.g. Website Design" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="lead-status">Lead Status</label>
+                  <select class="field" id="lead-status" required>
+                    <option value="New">New</option>
+                    <option value="Contacted">Contacted</option>
+                    <option value="Converted">Converted</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="form-message" class="feedback" role="status"></div>
+
+              <div class="form-actions">
+                <button type="submit" class="button button-primary" id="save-button">Save Lead</button>
+                <button type="button" class="button button-secondary" id="cancel-edit">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
