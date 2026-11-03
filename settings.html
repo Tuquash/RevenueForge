@@ -4,31 +4,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your RevenueForge account and session settings.">
   <title>Settings | RevenueForge</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="app.js" defer></script>
 </head>
+
 <body data-page="settings">
   <div class="app-layout">
+
     <aside class="sidebar">
       <div class="brand">Revenue<span>Forge</span></div>
+
       <div class="nav-label">WORKSPACE</div>
-      <nav>
-        <a class="nav-link" href="index.html"><span class="nav-icon">▦</span>Dashboard</a>
-        <a class="nav-link" href="leads.html"><span class="nav-icon">◉</span>Leads</a>
-        <a class="nav-link" href="add-lead.html"><span class="nav-icon">＋</span>Add Lead</a>
-        <a class="nav-link" href="follow-ups.html"><span class="nav-icon">✉</span>Follow-ups</a>
-        <a class="nav-link" href="reports.html"><span class="nav-icon">▤</span>Reports</a>
+
+      <nav aria-label="Main navigation">
+        <a class="nav-link" href="index.html">
+          <span class="nav-icon">▦</span>Dashboard
+        </a>
+        <a class="nav-link" href="leads.html">
+          <span class="nav-icon">◉</span>Leads
+        </a>
+        <a class="nav-link" href="add-lead.html">
+          <span class="nav-icon">＋</span>Add Lead
+        </a>
+        <a class="nav-link" href="follow-ups.html">
+          <span class="nav-icon">✉</span>Follow-ups
+        </a>
+        <a class="nav-link" href="reports.html">
+          <span class="nav-icon">▤</span>Reports
+        </a>
       </nav>
+
       <div class="sidebar-bottom">
-        <a class="nav-link active" href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
-        <button class="nav-link" id="sign-out" style="width:100%;border:0;background:transparent;text-align:left;"><span class="nav-icon">↪</span>Sign out</button>
+        <a class="nav-link active" href="settings.html" aria-current="page">
+          <span class="nav-icon">⚙</span>Settings
+        </a>
+        <button class="nav-link" id="sign-out" type="button"
+          style="width:100%;border:0;background:transparent;text-align:left;">
+          <span class="nav-icon">↪</span>Sign out
+        </button>
       </div>
     </aside>
 
     <main class="main-area">
+
       <header class="topbar">
         <div class="topbar-title">Settings</div>
         <div class="topbar-right">
@@ -38,60 +65,70 @@
       </header>
 
       <div class="content">
+
         <section class="page-heading">
           <div>
             <h1>Account Settings</h1>
-            <p>View your RevenueForge account information.</p>
+            <p>Manage your account information and active session.</p>
           </div>
         </section>
 
         <section class="panel">
           <div class="panel-header">
-            <h2>Account Information</h2>
+            <div>
+              <h2>Account Information</h2>
+              <p class="muted">Your connected RevenueForge account.</p>
+            </div>
           </div>
+
           <div class="panel-body">
+
             <div class="form-group">
-              <label>Email Address</label>
-              <div class="field" id="settings-email">Loading account...</div>
+              <label for="settings-email">Email Address</label>
+              <div class="field" id="settings-email">
+                Loading account...
+              </div>
             </div>
 
             <div class="form-group">
               <label>Account Status</label>
-              <div class="field">Authenticated</div>
+              <div class="field">
+                Authenticated
+              </div>
             </div>
 
-            <p class="storage-note">Your lead records are stored in your connected Supabase database. Account authentication is managed securely through Supabase.</p>
+            <p class="storage-note">
+              Your lead records are stored in your connected Supabase database. Authentication and account sessions are managed through Supabase.
+            </p>
+
           </div>
         </section>
 
         <section class="panel">
           <div class="panel-header">
-            <h2>Session</h2>
+            <div>
+              <h2>Session Management</h2>
+              <p class="muted">Control your current account session.</p>
+            </div>
           </div>
+
           <div class="panel-body">
-            <p class="muted">Sign out of your RevenueForge account on this device.</p>
-            <button class="button button-danger" id="settings-sign-out" type="button">Sign Out</button>
+            <p class="muted">
+              Sign out of RevenueForge on this device. You will need to log in again to access your dashboard.
+            </p>
+
+            <button
+              class="button button-danger"
+              id="settings-sign-out"
+              type="button"
+            >
+              Sign Out
+            </button>
           </div>
         </section>
+
       </div>
     </main>
   </div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const email = document.getElementById("user-email");
-
-      const observer = new MutationObserver(function () {
-        document.getElementById("settings-email").textContent =
-          email.textContent;
-      });
-
-      observer.observe(email, { childList: true, characterData: true, subtree: true });
-
-      document.getElementById("settings-sign-out").addEventListener("click", function () {
-        document.getElementById("sign-out").click();
-      });
-    });
-  </script>
 </body>
 </html>
