@@ -1,104 +1,339 @@
-(function () {
-  const url = window.REVENUEFORGE_SUPABASE_URL;
-  const key = window.REVENUEFORGE_SUPABASE_KEY;
 
-  if (!url || !key || !window.supabase) {
-    console.error("RevenueForge: Supabase configuration missing.");
+"use strict";
+
+(() => {
+  // ==========================================
+  // REVENUEFORGE - APPLICATION CORE
+  // ==========================================
+
+  const $ = (id) => document.getElementById(id);
+
+  const SUPABASE_URL = window.REVENUEFORGE_SUPABASE_URL;
+  const SUPABASE_KEY = window.REVENUEFORGE_SUPABASE_KEY;
+
+  if (!SUPABASE_URL || !SUPABASE_KEY || !window.supabase) {
+    console.error("RevenueForge: Supabase configuration is missing.");
+    showMessage("Connection configuration is missing. Contact support.", true);
     return;
   }
 
-  const db = window.supabase.createClient(url, key);
-  let leads = [];
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   let currentUser = null;
+  let leads = [];
+  let isLoading = false;
 
-  const $ = id => document.getElementById(id);
+  const VALID_STATUSES = ["New", "Contacted", "Converted"];
 
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, c => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;",
-      '"': "&quot;", "'": "&#039;"
-    })[c]);
+  // ==========================================
+  // GENERAL HELPERS
+  // ==========================================
+
+  function showMessage(message, isError = false, target = null) {
+    const element =
+      (target && $(target)) ||
+      $("form-message") ||
+      $("page-message") ||
+      $("generator-feedback");
+
+    if (!element) {
+      if (isError) console.error(message);
+      return;
+    }
+
+    element.textContent = message;
+    element.className = isError ? "feedback error" : "feedback";
+    element.setAttribute("role", "status");
   }
 
   function setText(id, value) {
-    if ($(id)) $(id).textContent = value;
+    const element = $(id);
+    if (element) element.textContent = value;
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    })[character]);
   }
 
   function formatDate(value) {
-    return value ? new Date(value).toLocaleDateString() : "—";
+    if (!value) return "—";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return "—";
+
+    return date.toLocaleDateString(undefined, {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
   }
 
-  function statusBadge(status) {
-    const css = {
+  function getStatusClass(status) {
+    return {
       New: "status-new",
       Contacted: "status-contacted",
       Converted: "status-converted"
     }[status] || "status-new";
-
-    return `<span class="status-badge ${css}">${escapeHTML(status)}</span>`;
   }
+
+  function statusBadge(status) {
+    return `<span class="status-badge ${getStatusClass(status)}">${escapeHTML(status)}</span>`;
+  }
+
+  function getLeadById(id) {
+    return leads.find((lead) => String(lead.id) === String(id));
+  }
+
+  function getFirstName(name) {
+    return String(name || "").trim().split(/\s+/)[0] || "there";
+  }
+
+  // ==========================================
+  // USER AUTHENTICATION
+  // ==========================================
 
   async function initialise() {
-    const { data, error } = await db.auth.getSession();
+    try {
+      const { data, error } = await db.auth.getSession();
 
-    if (error || !data.session) {
-      location.href = "login.html";
-      return;
+      if (error) throw error;
+
+      if (!data.session) {
+        window.location.replace("login.html");
+        return;
+      }
+
+      currentUser = data.session.user;
+
+      setText("user-email", currentUser.email || "Account");
+      setText("settings-email", currentUser.email || "Account");
+
+      await loadLeads();
+      setupPage();
+
+    } catch (error) {
+      console.error("RevenueForge initialization error:", error);
+
+      showMessage(
+        "Unable to load your workspace. Please refresh and try again.",
+        true
+      );
     }
-
-    currentUser = data.session.user;
-    setText("user-email", currentUser.email || "Account");
-    setText("settings-email", currentUser.email || "Account");
-
-    await loadLeads();
-    setupPage();
   }
+
+  async function signOut() {
+    const buttons = [
+      $("sign-out"),
+      $("settings-sign-out")
+    ].filter(Boolean);
+
+    buttons.forEach((button) => {
+      button.disabled = true;
+      button.textContent = "Signing out...";
+    });
+
+    try {
+      const { error } = await db.auth.signOut();
+
+      if (error) throw error;
+
+      window.location.replace("login.html");
+
+    } catch (error) {
+      console.error("Sign-out error:", error);
+
+      showMessage(
+        "Unable to sign out: " + error.message,
+        true
+      );
+
+      buttons.forEach((button) => {
+        button.disabled = false;
+        button.textContent = "Sign Out";
+      });
+    }
+  }
+
+  // ==========================================
+  // DATABASE
+  // ==========================================
 
   async function loadLeads() {
-    const { data, error } = await db
-      .from("leads")
-      .select("*")
-      .eq("user_id", currentUser.id)
-      .order("created_at", { ascending: false });
+    if (!currentUser || isLoading) return;
 
-    if (error) {
-      console.error("Could not load leads:", error);
-      showMessage("Unable to load leads. Check your database connection.", true);
-      return;
+    isLoading = true;
+
+    const table = $("leads-list");
+
+    if (table) {
+      table.innerHTML =
+        '<tr><td colspan="6" class="empty-state">Loading leads...</td></tr>';
     }
 
-    leads = data || [];
-    renderDashboard();
-    renderLeadList();
-    renderFollowUpOptions();
-    renderReports();
+    try {
+      const { data, error } = await db
+        .from("leads")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      leads = Array.isArray(data) ? data : [];
+
+      renderDashboard();
+      renderLeadList();
+      renderFollowUpOptions();
+      renderReports();
+
+      return leads;
+
+    } catch (error) {
+      console.error("Lead loading error:", error);
+
+      showMessage(
+        "Unable to load leads. Check your connection and try again.",
+        true
+      );
+
+      throw error;
+
+    } finally {
+      isLoading = false;
+    }
   }
+
+  async function saveLeadToDatabase(lead, id = null) {
+    if (!currentUser) {
+      throw new Error("Please sign in before saving a lead.");
+    }
+
+    if (id) {
+      const { error } = await db
+        .from("leads")
+        .update({
+          name: lead.name,
+          email: lead.email,
+          service: lead.service,
+          status: lead.status
+        })
+        .eq("id", id)
+        .eq("user_id", currentUser.id);
+
+      if (error) throw error;
+
+    } else {
+      const { error } = await db
+        .from("leads")
+        .insert({
+          user_id: currentUser.id,
+          name: lead.name,
+          email: lead.email,
+          service: lead.service,
+          status: lead.status
+        });
+
+      if (error) throw error;
+    }
+  }
+
+  async function deleteLead(id) {
+    const lead = getLeadById(id);
+
+    if (!lead) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${lead.name}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const { error } = await db
+        .from("leads")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", currentUser.id);
+
+      if (error) throw error;
+
+      leads = leads.filter(
+        (item) => String(item.id) !== String(id)
+      );
+
+      renderDashboard();
+      renderLeadList();
+      renderFollowUpOptions();
+      renderReports();
+
+      showMessage("Lead deleted successfully.");
+
+    } catch (error) {
+      console.error("Delete error:", error);
+
+      showMessage(
+        "Could not delete lead: " + error.message,
+        true
+      );
+    }
+  }
+
+  // ==========================================
+  // DASHBOARD
+  // ==========================================
 
   function renderDashboard() {
     const total = leads.length;
-    const fresh = leads.filter(x => x.status === "New").length;
-    const contacted = leads.filter(x => x.status === "Contacted").length;
-    const converted = leads.filter(x => x.status === "Converted").length;
-    const rate = total ? Math.round(converted / total * 100) : 0;
+
+    const fresh = leads.filter(
+      (lead) => lead.status === "New"
+    ).length;
+
+    const contacted = leads.filter(
+      (lead) => lead.status === "Contacted"
+    ).length;
+
+    const converted = leads.filter(
+      (lead) => lead.status === "Converted"
+    ).length;
+
+    const rate = total
+      ? Math.round((converted / total) * 100)
+      : 0;
 
     setText("total-leads", total);
     setText("new-leads", fresh);
     setText("contacted-leads", contacted);
     setText("converted-leads", converted);
+
     setText("pipeline-new", fresh);
     setText("pipeline-contacted", contacted);
     setText("pipeline-converted", converted);
     setText("conversion-rate", rate + "%");
 
     const table = $("recent-leads");
+
     if (!table) return;
 
-    if (!leads.length) {
-      table.innerHTML = '<tr><td colspan="5" class="empty-state">No leads yet. Add your first lead to get started.</td></tr>';
+    if (!total) {
+      table.innerHTML = `
+        <tr>
+          <td colspan="5" class="empty-state">
+            No leads yet. Add your first lead to get started.
+          </td>
+        </tr>
+      `;
       return;
     }
 
-    table.innerHTML = leads.slice(0, 5).map(lead => `
+    table.innerHTML = leads.slice(0, 5).map((lead) => `
       <tr>
         <td>${escapeHTML(lead.name)}</td>
         <td>${escapeHTML(lead.email)}</td>
@@ -109,29 +344,54 @@
     `).join("");
   }
 
+  // ==========================================
+  // LEADS PAGE
+  // ==========================================
+
   function renderLeadList() {
     const table = $("leads-list");
+
     if (!table) return;
 
-    const search = ($("search-leads")?.value || "").toLowerCase();
-    const status = $("filter-status")?.value || "";
+    const search = ($("search-leads")?.value || "")
+      .trim()
+      .toLowerCase();
 
-    const filtered = leads.filter(lead => {
-      const matchesSearch = [
-        lead.name, lead.email, lead.service
-      ].some(value => String(value || "").toLowerCase().includes(search));
+    const selectedStatus = $("filter-status")?.value || "";
 
-      return matchesSearch && (!status || lead.status === status);
+    const filtered = leads.filter((lead) => {
+      const searchable = [
+        lead.name,
+        lead.email,
+        lead.service
+      ];
+
+      const matchesSearch = searchable.some((value) =>
+        String(value || "").toLowerCase().includes(search)
+      );
+
+      const matchesStatus =
+        !selectedStatus || lead.status === selectedStatus;
+
+      return matchesSearch && matchesStatus;
     });
 
-    setText("lead-count", `${filtered.length} leads`);
+    setText("lead-count", `${filtered.length} of ${leads.length} leads`);
 
     if (!filtered.length) {
-      table.innerHTML = '<tr><td colspan="6" class="empty-state">No matching leads found.</td></tr>';
+      table.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-state">
+            ${leads.length
+              ? "No leads match your search or filter."
+              : "No leads yet. Add your first lead to get started."}
+          </td>
+        </tr>
+      `;
       return;
     }
 
-    table.innerHTML = filtered.map(lead => `
+    table.innerHTML = filtered.map((lead) => `
       <tr>
         <td>${escapeHTML(lead.name)}</td>
         <td>${escapeHTML(lead.email)}</td>
@@ -139,121 +399,34 @@
         <td>${statusBadge(lead.status)}</td>
         <td>${formatDate(lead.created_at)}</td>
         <td>
-          <a class="action-button" href="add-lead.html?id=${encodeURIComponent(lead.id)}">Edit</a>
-          <button class="action-button delete-button" data-delete="${escapeHTML(lead.id)}">Delete</button>
+          <a
+            class="action-button"
+            href="add-lead.html?id=${encodeURIComponent(lead.id)}"
+          >Edit</a>
+
+          <button
+            type="button"
+            class="action-button delete-button"
+            data-delete="${escapeHTML(lead.id)}"
+          >Delete</button>
         </td>
       </tr>
     `).join("");
   }
 
-  function renderReports() {
-    const total = leads.length;
-    const fresh = leads.filter(x => x.status === "New").length;
-    const contacted = leads.filter(x => x.status === "Contacted").length;
-    const converted = leads.filter(x => x.status === "Converted").length;
-    const rate = total ? Math.round(converted / total * 100) : 0;
-
-    setText("report-total", total);
-    setText("report-new", fresh);
-    setText("report-contacted", contacted);
-    setText("report-converted", converted);
-    setText("report-rate", rate + "%");
-
-    const progress = $("report-progress");
-    if (progress) progress.style.width = rate + "%";
-
-    setText("breakdown-new", fresh);
-    setText("breakdown-contacted", contacted);
-    setText("breakdown-converted", converted);
-
-    const percentage = count => total ? (count / total * 100) + "%" : "0%";
-
-    if ($("bar-new")) $("bar-new").style.width = percentage(fresh);
-    if ($("bar-contacted")) $("bar-contacted").style.width = percentage(contacted);
-    if ($("bar-converted")) $("bar-converted").style.width = percentage(converted);
-  }
-
-  function renderFollowUpOptions() {
-    const select = $("follow-up-lead");
-    if (!select) return;
-
-    const previous = select.value;
-
-    select.innerHTML =
-      '<option value="">Choose a lead</option>' +
-      leads.map(lead => `
-        <option value="${escapeHTML(lead.id)}">${escapeHTML(lead.name)} — ${escapeHTML(lead.service || "No service")}</option>
-      `).join("");
-
-    if (leads.some(lead => String(lead.id) === previous)) {
-      select.value = previous;
-    }
-  }
-
-  async function deleteLead(id) {
-    if (!confirm("Are you sure you want to delete this lead?")) return;
-
-    const { error } = await db
-      .from("leads")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", currentUser.id);
-
-    if (error) {
-      alert("Could not delete lead: " + error.message);
-      return;
-    }
-
-    await loadLeads();
-  }
-
-  async function saveLead(event) {
-    event.preventDefault();
-
-    const id = $("lead-id")?.value || "";
-    const name = $("lead-name")?.value.trim();
-    const email = $("lead-email")?.value.trim();
-    const service = $("lead-business")?.value.trim();
-    const status = $("lead-status")?.value || "New";
-
-    if (!name || !email || !service) {
-      showMessage("Please complete all fields.", true);
-      return;
-    }
-
-    const payload = { name, email, service, status };
-    let result;
-
-    if (id) {
-      result = await db.from("leads")
-        .update(payload)
-        .eq("id", id)
-        .eq("user_id", currentUser.id);
-    } else {
-      result = await db.from("leads")
-        .insert({ ...payload, user_id: currentUser.id });
-    }
-
-    if (result.error) {
-      showMessage("Could not save lead: " + result.error.message, true);
-      return;
-    }
-
-    showMessage(id ? "Lead updated successfully." : "Lead added successfully.");
-
-    setTimeout(() => {
-      location.href = "leads.html";
-    }, 800);
-  }
+  // ==========================================
+  // ADD AND EDIT LEADS
+  // ==========================================
 
   function setupAddLead() {
     const form = $("lead-form");
+
     if (!form) return;
 
-    const id = new URLSearchParams(location.search).get("id");
+    const id = new URLSearchParams(window.location.search).get("id");
 
     if (id) {
-      const lead = leads.find(item => String(item.id) === id);
+      const lead = getLeadById(id);
 
       if (!lead) {
         showMessage("Lead not found.", true);
@@ -274,113 +447,336 @@
     form.addEventListener("submit", saveLead);
 
     $("cancel-edit")?.addEventListener("click", () => {
-      location.href = "leads.html";
+      window.location.href = "leads.html";
     });
+  }
+
+  async function saveLead(event) {
+    event.preventDefault();
+
+    if (!currentUser) {
+      showMessage("Please sign in before saving leads.", true);
+      return;
+    }
+
+    const id = $("lead-id")?.value || null;
+
+    const lead = {
+      name: $("lead-name")?.value.trim() || "",
+      email: $("lead-email")?.value.trim() || "",
+      service: $("lead-business")?.value.trim() || "",
+      status: $("lead-status")?.value || "New"
+    };
+
+    if (!lead.name || !lead.email || !lead.service) {
+      showMessage("Please complete all fields.", true);
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email)) {
+      showMessage("Enter a valid email address.", true);
+      return;
+    }
+
+    if (!VALID_STATUSES.includes(lead.status)) {
+      showMessage("Choose a valid lead status.", true);
+      return;
+    }
+
+    const duplicate = leads.some((item) =>
+      item.email.toLowerCase() === lead.email.toLowerCase() &&
+      String(item.id) !== String(id)
+    );
+
+    if (duplicate) {
+      showMessage("A lead with this email already exists.", true);
+      return;
+    }
+
+    const button = $("save-button");
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Saving...";
+    }
+
+    try {
+      await saveLeadToDatabase(lead, id);
+
+      showMessage(
+        id ? "Lead updated successfully." : "Lead added successfully."
+      );
+
+      window.setTimeout(() => {
+        window.location.href = "leads.html";
+      }, 700);
+
+    } catch (error) {
+      console.error("Save error:", error);
+
+      showMessage(
+        "Could not save lead: " + error.message,
+        true
+      );
+
+      if (button) {
+        button.disabled = false;
+        button.textContent = id ? "Save Changes" : "Save Lead";
+      }
+    }
+  }
+
+  // ==========================================
+  // REPORTS
+  // ==========================================
+
+  function renderReports() {
+    const total = leads.length;
+
+    const fresh = leads.filter(
+      (lead) => lead.status === "New"
+    ).length;
+
+    const contacted = leads.filter(
+      (lead) => lead.status === "Contacted"
+    ).length;
+
+    const converted = leads.filter(
+      (lead) => lead.status === "Converted"
+    ).length;
+
+    const rate = total
+      ? Math.round((converted / total) * 100)
+      : 0;
+
+    setText("report-total", total);
+    setText("report-new", fresh);
+    setText("report-contacted", contacted);
+    setText("report-converted", converted);
+    setText("report-rate", rate + "%");
+
+    const progress = $("report-progress");
+
+    if (progress) {
+      progress.style.width = rate + "%";
+      progress.setAttribute("aria-valuenow", String(rate));
+    }
+
+    setText("breakdown-new", fresh);
+    setText("breakdown-contacted", contacted);
+    setText("breakdown-converted", converted);
+
+    const percentage = (count) =>
+      total ? `${(count / total) * 100}%` : "0%";
+
+    if ($("bar-new")) {
+      $("bar-new").style.width = percentage(fresh);
+    }
+
+    if ($("bar-contacted")) {
+      $("bar-contacted").style.width = percentage(contacted);
+    }
+
+    if ($("bar-converted")) {
+      $("bar-converted").style.width = percentage(converted);
+    }
+  }
+
+  // ==========================================
+  // FOLLOW-UP GENERATOR
+  // ==========================================
+
+  function renderFollowUpOptions() {
+    const select = $("follow-up-lead");
+
+    if (!select) return;
+
+    const previous = select.value;
+
+    select.innerHTML = '<option value="">Choose a lead</option>';
+
+    leads.forEach((lead) => {
+      const option = document.createElement("option");
+
+      option.value = lead.id;
+      option.textContent =
+        `${lead.name} — ${lead.service || "No service"}`;
+
+      select.appendChild(option);
+    });
+
+    if (leads.some((lead) => String(lead.id) === previous)) {
+      select.value = previous;
+    }
   }
 
   function generateFollowUp() {
     const id = $("follow-up-lead")?.value;
-    const type = $("message-type")?.value;
-    const channel = $("message-service")?.value;
+    const type = $("message-type")?.value || "initial";
+    const channel = $("message-service")?.value || "email";
     const output = $("generated-message");
 
-    const lead = leads.find(item => String(item.id) === id);
+    const lead = getLeadById(id);
 
     if (!lead) {
-      setText("generator-feedback", "Please select a lead first.");
+      showMessage(
+        "Please select a lead first.",
+        true,
+        "generator-feedback"
+      );
       return;
     }
 
-    const name = lead.name.split(" ")[0];
+    const name = getFirstName(lead.name);
     const service = lead.service || "your project";
 
     const templates = {
-      initial: `Hi ${name},\n\nI hope you're doing well. I'm following up regarding ${service}. I'd love to know if you're still interested and whether you have any questions I can help answer.\n\nLooking forward to hearing from you.`,
-      reminder: `Hi ${name},\n\nJust checking in to see if you've had a chance to review our previous conversation about ${service}. Let me know if there's anything you'd like me to clarify.\n\nThanks!`,
-      proposal: `Hi ${name},\n\nI wanted to follow up on the proposal for ${service}. I'd be happy to discuss the details and answer any questions you may have.\n\nPlease let me know what works best for you.`,
-      closing: `Hi ${name},\n\nI wanted to check in one last time regarding ${service}. If you're ready to move forward, I'd be glad to discuss the next steps. If your plans have changed, that's completely fine too.\n\nThank you for your time.`
+      initial: `Hello ${name},
+
+I hope you're doing well. I'm reaching out regarding ${service}. I'd like to understand your needs and discuss how we could help.
+
+Would you be available for a brief conversation?
+
+Best regards`,
+
+      reminder: `Hello ${name},
+
+I wanted to check whether you've had a chance to review our previous conversation about ${service}.
+
+Please let me know if you have any questions or need further information.
+
+Best regards`,
+
+      proposal: `Hello ${name},
+
+I'm following up on the proposal regarding ${service}.
+
+I'd be happy to clarify any details, discuss your requirements and answer any questions you may have.
+
+Please let me know what works best for you.
+
+Best regards`,
+
+      closing: `Hello ${name},
+
+I'm checking in regarding ${service} to see whether you're ready to discuss the next steps.
+
+If you're still interested, I'd be happy to move the conversation forward.
+
+Thank you for your time.
+
+Best regards`
     };
 
     let message = templates[type] || templates.initial;
 
     if (channel === "whatsapp") {
+      message = message.replace(/^Hello /, "Hi ");
       message = message.replace(/\n\n/g, "\n");
     }
 
     if (channel === "linkedin") {
-      message = message.replace("Hi ", "Hello ");
+      message = message.replace(/^Hello /, "Hello ");
     }
 
     output.value = message;
-    setText("generator-feedback", "Message generated. Review it before sending.");
+
+    showMessage(
+      "Message generated. Review and personalize it before sending.",
+      false,
+      "generator-feedback"
+    );
   }
 
-  function setupPage() {
-    $("search-leads")?.addEventListener("input", renderLeadList);
-    $("filter-status")?.addEventListener("change", renderLeadList);
+  async function copyFollowUp() {
+    const output = $("generated-message");
+    const message = output?.value.trim() || "";
 
-    $("leads-list")?.addEventListener("click", event => {
-      const button = event.target.closest("[data-delete]");
-      if (button) deleteLead(button.dataset.delete);
-    });
-
-    setupAddLead();
-
-    $("generate-message")?.addEventListener("click", generateFollowUp);
-
-    $("copy-message")?.addEventListener("click", async () => {
-      const message = $("generated-message")?.value || "";
-
-      if (!message) {
-        setText("generator-feedback", "Generate a message first.");
-        return;
-      }
-
-      try {
-        await navigator.clipboard.writeText(message);
-        setText("generator-feedback", "Message copied.");
-      } catch {
-        $("generated-message").select();
-        document.execCommand("copy");
-        setText("generator-feedback", "Message copied.");
-      }
-    });
-
-    const signOut = async () => {
-      const { error } = await db.auth.signOut();
-
-      if (error) {
-        alert("Unable to sign out: " + error.message);
-        return;
-      }
-
-      location.href = "login.html";
-    };
-
-    $("sign-out")?.addEventListener("click", signOut);
-    $("settings-sign-out")?.addEventListener("click", signOut);
-  }
-
-  function showMessage(message, isError = false) {
-    const element = $("form-message") || $("page-message");
-    if (!element) {
-      if (isError) console.error(message);
+    if (!message) {
+      showMessage(
+        "Generate a message first.",
+        true,
+        "generator-feedback"
+      );
       return;
     }
 
-    element.textContent = message;
-    element.className = isError ? "feedback error" : "feedback";
+    try {
+      await navigator.clipboard.writeText(message);
+
+      showMessage(
+        "Message copied to clipboard.",
+        false,
+        "generator-feedback"
+      );
+
+    } catch (error) {
+      output.focus();
+      output.select();
+
+      const copied = document.execCommand("copy");
+
+      showMessage(
+        copied
+          ? "Message copied to clipboard."
+          : "Select the message and press Ctrl+C to copy.",
+        !copied,
+        "generator-feedback"
+      );
+    }
   }
 
-  window.rf = {
-    db,
-    getLeads: () => leads,
-    refresh: loadLeads
-  };
+  // ==========================================
+  // PAGE EVENT LISTENERS
+  // ==========================================
 
-  db.auth.onAuthStateChange(event => {
-    if (event === "SIGNED_OUT") location.href = "login.html";
+  function setupPage() {
+    $("search-leads")?.addEventListener("input", renderLeadList);
+
+    $("filter-status")?.addEventListener("change", renderLeadList);
+
+    $("leads-list")?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-delete]");
+
+      if (button) {
+        deleteLead(button.dataset.delete);
+      }
+    });
+
+    $("generate-message")?.addEventListener(
+      "click",
+      generateFollowUp
+    );
+
+    $("copy-message")?.addEventListener(
+      "click",
+      copyFollowUp
+    );
+
+    $("sign-out")?.addEventListener("click", signOut);
+
+    $("settings-sign-out")?.addEventListener("click", signOut);
+
+    setupAddLead();
+  }
+
+  // ==========================================
+  // AUTHENTICATION STATE CHANGES
+  // ==========================================
+
+  db.auth.onAuthStateChange((event) => {
+    if (event === "SIGNED_OUT") {
+      currentUser = null;
+      leads = [];
+
+      window.location.replace("login.html");
+    }
   });
 
+  // ==========================================
+  // START APPLICATION
+  // ==========================================
+
   initialise();
+
 })();
