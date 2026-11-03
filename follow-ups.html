@@ -4,31 +4,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Generate professional sales follow-up messages with RevenueForge.">
   <title>Follow-ups | RevenueForge</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="app.js" defer></script>
 </head>
+
 <body data-page="follow-ups">
   <div class="app-layout">
+
     <aside class="sidebar">
       <div class="brand">Revenue<span>Forge</span></div>
+
       <div class="nav-label">WORKSPACE</div>
-      <nav>
-        <a class="nav-link" href="index.html"><span class="nav-icon">▦</span>Dashboard</a>
-        <a class="nav-link" href="leads.html"><span class="nav-icon">◉</span>Leads</a>
-        <a class="nav-link" href="add-lead.html"><span class="nav-icon">＋</span>Add Lead</a>
-        <a class="nav-link active" href="follow-ups.html"><span class="nav-icon">✉</span>Follow-ups</a>
-        <a class="nav-link" href="reports.html"><span class="nav-icon">▤</span>Reports</a>
+
+      <nav aria-label="Main navigation">
+        <a class="nav-link" href="index.html">
+          <span class="nav-icon">▦</span>Dashboard
+        </a>
+        <a class="nav-link" href="leads.html">
+          <span class="nav-icon">◉</span>Leads
+        </a>
+        <a class="nav-link" href="add-lead.html">
+          <span class="nav-icon">＋</span>Add Lead
+        </a>
+        <a class="nav-link active" href="follow-ups.html" aria-current="page">
+          <span class="nav-icon">✉</span>Follow-ups
+        </a>
+        <a class="nav-link" href="reports.html">
+          <span class="nav-icon">▤</span>Reports
+        </a>
       </nav>
+
       <div class="sidebar-bottom">
-        <a class="nav-link" href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
-        <button class="nav-link" id="sign-out" style="width:100%;border:0;background:transparent;text-align:left;"><span class="nav-icon">↪</span>Sign out</button>
+        <a class="nav-link" href="settings.html">
+          <span class="nav-icon">⚙</span>Settings
+        </a>
+        <button class="nav-link" id="sign-out" type="button"
+          style="width:100%;border:0;background:transparent;text-align:left;">
+          <span class="nav-icon">↪</span>Sign out
+        </button>
       </div>
     </aside>
 
     <main class="main-area">
+
       <header class="topbar">
         <div class="topbar-title">Follow-up Generator</div>
         <div class="topbar-right">
@@ -38,28 +65,34 @@
       </header>
 
       <div class="content">
+
         <section class="page-heading">
           <div>
             <h1>Follow-up Messages</h1>
-            <p>Create professional messages to reconnect with potential customers.</p>
+            <p>Create tailored messages to reconnect with prospects and move conversations forward.</p>
           </div>
         </section>
 
         <section class="panel">
           <div class="panel-header">
-            <h2>Message Generator</h2>
-            <span class="muted">Sales communication</span>
+            <div>
+              <h2>Message Generator</h2>
+              <p class="muted">Create a message based on your selected lead and communication channel.</p>
+            </div>
+            <span class="muted">Sales tools</span>
           </div>
 
           <div class="panel-body">
+
             <div class="form-group">
               <label for="follow-up-lead">Select Lead</label>
-              <select class="field" id="follow-up-lead">
+              <select class="field" id="follow-up-lead" required>
                 <option value="">Choose a lead</option>
               </select>
             </div>
 
             <div class="form-grid">
+
               <div class="form-group">
                 <label for="message-type">Message Type</label>
                 <select class="field" id="message-type">
@@ -78,23 +111,54 @@
                   <option value="linkedin">LinkedIn</option>
                 </select>
               </div>
-            </div>
 
-            <button class="button button-primary" id="generate-message" type="button">Generate Message</button>
-
-            <div class="form-group" style="margin-top:25px;">
-              <label for="generated-message">Generated Message</label>
-              <textarea class="field" id="generated-message" rows="9" placeholder="Your generated message will appear here..."></textarea>
             </div>
 
             <div class="form-actions">
-              <button class="button button-secondary" id="copy-message" type="button">Copy Message</button>
-              <span id="generator-feedback" class="feedback"></span>
+              <button
+                class="button button-primary"
+                id="generate-message"
+                type="button"
+              >
+                Generate Message
+              </button>
             </div>
 
-            <p class="storage-note">Messages are generated from built-in templates. Review and personalize each message before sending. RevenueForge does not send messages automatically.</p>
+            <div class="form-group" style="margin-top:25px;">
+              <label for="generated-message">Generated Message</label>
+              <textarea
+                class="field"
+                id="generated-message"
+                rows="10"
+                placeholder="Your generated message will appear here..."
+                aria-label="Generated follow-up message"
+              ></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button
+                class="button button-secondary"
+                id="copy-message"
+                type="button"
+              >
+                Copy Message
+              </button>
+
+              <span
+                id="generator-feedback"
+                class="feedback"
+                role="status"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <p class="storage-note">
+              Messages are generated using built-in templates. Review and personalise each message before sending. RevenueForge does not automatically send emails, WhatsApp messages or LinkedIn messages.
+            </p>
+
           </div>
         </section>
+
       </div>
     </main>
   </div>
