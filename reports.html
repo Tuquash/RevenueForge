@@ -4,31 +4,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track lead pipeline and conversion performance with RevenueForge.">
   <title>Reports | RevenueForge</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="app.js" defer></script>
 </head>
+
 <body data-page="reports">
   <div class="app-layout">
+
     <aside class="sidebar">
       <div class="brand">Revenue<span>Forge</span></div>
+
       <div class="nav-label">WORKSPACE</div>
-      <nav>
-        <a class="nav-link" href="index.html"><span class="nav-icon">▦</span>Dashboard</a>
-        <a class="nav-link" href="leads.html"><span class="nav-icon">◉</span>Leads</a>
-        <a class="nav-link" href="add-lead.html"><span class="nav-icon">＋</span>Add Lead</a>
-        <a class="nav-link" href="follow-ups.html"><span class="nav-icon">✉</span>Follow-ups</a>
-        <a class="nav-link active" href="reports.html"><span class="nav-icon">▤</span>Reports</a>
+
+      <nav aria-label="Main navigation">
+        <a class="nav-link" href="index.html">
+          <span class="nav-icon">▦</span>Dashboard
+        </a>
+        <a class="nav-link" href="leads.html">
+          <span class="nav-icon">◉</span>Leads
+        </a>
+        <a class="nav-link" href="add-lead.html">
+          <span class="nav-icon">＋</span>Add Lead
+        </a>
+        <a class="nav-link" href="follow-ups.html">
+          <span class="nav-icon">✉</span>Follow-ups
+        </a>
+        <a class="nav-link active" href="reports.html" aria-current="page">
+          <span class="nav-icon">▤</span>Reports
+        </a>
       </nav>
+
       <div class="sidebar-bottom">
-        <a class="nav-link" href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
-        <button class="nav-link" id="sign-out" style="width:100%;border:0;background:transparent;text-align:left;"><span class="nav-icon">↪</span>Sign out</button>
+        <a class="nav-link" href="settings.html">
+          <span class="nav-icon">⚙</span>Settings
+        </a>
+        <button class="nav-link" id="sign-out" type="button"
+          style="width:100%;border:0;background:transparent;text-align:left;">
+          <span class="nav-icon">↪</span>Sign out
+        </button>
       </div>
     </aside>
 
     <main class="main-area">
+
       <header class="topbar">
         <div class="topbar-title">Sales Reports</div>
         <div class="topbar-right">
@@ -38,81 +65,134 @@
       </header>
 
       <div class="content">
+
         <section class="page-heading">
           <div>
             <h1>Reports & Analytics</h1>
-            <p>Understand your sales pipeline and lead conversion performance.</p>
+            <p>Monitor your lead pipeline and understand how effectively prospects are converting.</p>
           </div>
         </section>
 
         <section class="stats-grid">
+
           <div class="stat-card">
-            <div class="stat-top"><span class="stat-label">Total Leads</span><span class="stat-icon">◉</span></div>
+            <div class="stat-top">
+              <span class="stat-label">Total Leads</span>
+              <span class="stat-icon">◉</span>
+            </div>
             <div class="stat-number" id="report-total">0</div>
             <div class="stat-note">All recorded prospects</div>
           </div>
+
           <div class="stat-card">
-            <div class="stat-top"><span class="stat-label">New Leads</span><span class="stat-icon">＋</span></div>
+            <div class="stat-top">
+              <span class="stat-label">New Leads</span>
+              <span class="stat-icon">＋</span>
+            </div>
             <div class="stat-number" id="report-new">0</div>
             <div class="stat-note">Awaiting contact</div>
           </div>
+
           <div class="stat-card">
-            <div class="stat-top"><span class="stat-label">Contacted</span><span class="stat-icon">✉</span></div>
+            <div class="stat-top">
+              <span class="stat-label">Contacted</span>
+              <span class="stat-icon">✉</span>
+            </div>
             <div class="stat-number" id="report-contacted">0</div>
             <div class="stat-note">Contact has been made</div>
           </div>
+
           <div class="stat-card">
-            <div class="stat-top"><span class="stat-label">Converted</span><span class="stat-icon">✓</span></div>
+            <div class="stat-top">
+              <span class="stat-label">Converted</span>
+              <span class="stat-icon">✓</span>
+            </div>
             <div class="stat-number" id="report-converted">0</div>
             <div class="stat-note">Successful conversions</div>
           </div>
+
         </section>
 
         <section class="panel">
           <div class="panel-header">
-            <h2>Conversion performance</h2>
+            <div>
+              <h2>Conversion Performance</h2>
+              <p class="muted">Your overall lead-to-customer conversion rate.</p>
+            </div>
           </div>
+
           <div class="panel-body">
-            <div class="stat-label">Overall conversion rate</div>
+
+            <div class="stat-label">Overall Conversion Rate</div>
             <div class="stat-number" id="report-rate">0%</div>
-            <p class="muted">Percentage of recorded leads marked as Converted.</p>
-            <div style="height:12px;background:#edf0f5;border-radius:20px;overflow:hidden;margin-top:20px;">
-              <div id="report-progress" style="height:100%;width:0%;background:#4169e1;border-radius:20px;"></div>
+
+            <p class="muted">
+              Percentage of recorded leads currently marked as Converted.
+            </p>
+
+            <div
+              style="height:12px;background:#edf0f5;border-radius:20px;overflow:hidden;margin-top:20px;"
+              role="progressbar"
+              aria-label="Overall conversion rate"
+            >
+              <div
+                id="report-progress"
+                style="height:100%;width:0%;background:#4169e1;border-radius:20px;transition:width .3s ease;"
+              ></div>
             </div>
+
           </div>
         </section>
 
         <section class="panel">
           <div class="panel-header">
-            <h2>Pipeline breakdown</h2>
+            <div>
+              <h2>Pipeline Breakdown</h2>
+              <p class="muted">Distribution of leads across your three pipeline stages.</p>
+            </div>
           </div>
+
           <div class="panel-body">
+
             <div class="form-group">
-              <div style="display:flex;justify-content:space-between;margin-bottom:9px;">
-                <strong>New</strong><span id="breakdown-new">0</span>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
+                <strong>New</strong>
+                <span id="breakdown-new">0</span>
               </div>
-              <div style="height:9px;background:#edf0f5;border-radius:20px;overflow:hidden;">
-                <div id="bar-new" style="height:100%;width:0%;background:#4169e1;"></div>
+              <div style="height:10px;background:#edf0f5;border-radius:20px;overflow:hidden;">
+                <div id="bar-new"
+                  style="height:100%;width:0%;background:#4169e1;border-radius:20px;transition:width .3s ease;">
+                </div>
               </div>
             </div>
+
             <div class="form-group">
-              <div style="display:flex;justify-content:space-between;margin-bottom:9px;">
-                <strong>Contacted</strong><span id="breakdown-contacted">0</span>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
+                <strong>Contacted</strong>
+                <span id="breakdown-contacted">0</span>
               </div>
-              <div style="height:9px;background:#edf0f5;border-radius:20px;overflow:hidden;">
-                <div id="bar-contacted" style="height:100%;width:0%;background:#d69b28;"></div>
+              <div style="height:10px;background:#edf0f5;border-radius:20px;overflow:hidden;">
+                <div id="bar-contacted"
+                  style="height:100%;width:0%;background:#d69b28;border-radius:20px;transition:width .3s ease;">
+                </div>
               </div>
             </div>
+
             <div class="form-group">
-              <div style="display:flex;justify-content:space-between;margin-bottom:9px;">
-                <strong>Converted</strong><span id="breakdown-converted">0</span>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
+                <strong>Converted</strong>
+                <span id="breakdown-converted">0</span>
               </div>
-              <div style="height:9px;background:#edf0f5;border-radius:20px;overflow:hidden;">
-                <div id="bar-converted" style="height:100%;width:0%;background:#159b72;"></div>
+              <div style="height:10px;background:#edf0f5;border-radius:20px;overflow:hidden;">
+                <div id="bar-converted"
+                  style="height:100%;width:0%;background:#159b72;border-radius:20px;transition:width .3s ease;">
+                </div>
               </div>
             </div>
+
           </div>
         </section>
+
       </div>
     </main>
   </div>
