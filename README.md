@@ -1,77 +1,68 @@
+# RevenueForge — Lead Management Dashboard
 
-# RevenueForge
+A browser-based lead-management prototype for organising prospects and tracking a simple sales pipeline.
 
-A lightweight lead management and sales pipeline dashboard built to help individuals and small businesses organise prospects, track lead progress and manage follow-up communication.
+**Live demo:** https://tuquash.github.io/RevenueForge/
 
-**Live Demo:** https://tuquash.github.io/RevenueForge/
+## Current features
 
-## Features
+- Supabase email authentication and session handling
+- Create, view, edit and delete leads
+- Lead stages: New, Contacted and Converted
+- Search and status filtering
+- Follow-up message templates for email, WhatsApp and LinkedIn
+- Dashboard counts and conversion summaries
+- Responsive dashboard pages
 
-- **Authentication:** Account login and session management using Supabase.
-- **Lead Management:** Create, view, edit and delete leads.
-- **Lead Tracking:** Organise prospects into New, Contacted and Converted stages.
-- **Search and Filtering:** Find leads by name, email or service and filter by status.
-- **Follow-up Generator:** Generate email, WhatsApp and LinkedIn follow-up message templates.
-- **Reports and Analytics:** View lead totals, pipeline breakdown and conversion rate.
-- **Account Settings:** View account information and manage sessions.
-- **Responsive Interface:** Dashboard layout designed for desktop and mobile screens.
+## Technology
 
-## Technology Stack
+HTML, CSS, JavaScript, Supabase Auth, Supabase PostgreSQL and GitHub Pages.
 
-- HTML5
-- CSS3
-- JavaScript
-- Supabase Authentication
-- Supabase PostgreSQL Database
-- GitHub Pages
+## Database expectations
 
-## Database Structure
+The application expects a Supabase `leads` table containing:
 
-RevenueForge uses a Supabase `leads` table with these fields:
-
-| Field | Purpose |
+| Column | Purpose |
 |---|---|
 | `id` | Lead identifier |
-| `user_id` | Owner of the lead |
-| `name` | Prospect's name |
-| `email` | Prospect's email |
-| `service` | Service or business interest |
+| `user_id` | Authenticated owner |
+| `name` | Prospect name |
+| `email` | Prospect email |
+| `service` | Service or interest |
 | `status` | New, Contacted or Converted |
-| `created_at` | Record creation timestamp |
+| `created_at` | Creation timestamp |
 
-Row Level Security (RLS) policies restrict users to their own lead records.
+Enable Row Level Security on the table. Policies must restrict SELECT, INSERT, UPDATE and DELETE to rows where `auth.uid() = user_id`. For INSERT, enforce `WITH CHECK (auth.uid() = user_id)`; for UPDATE, enforce both USING and WITH CHECK. Do not rely on frontend filtering for access control.
 
-## Local Setup
+## Setup
 
-1. Clone or download this repository.
-2. Create a Supabase project.
-3. Configure the required `leads` table and RLS policies.
-4. Open `supabase-config.js`.
-5. Add your Supabase project URL and publishable key.
-6. Open `index.html` through a local web server or deploy the project using GitHub Pages.
+1. Create a Supabase project.
+2. Create the `leads` table with the columns above.
+3. Enable RLS and add owner-only policies for all CRUD operations.
+4. Configure `supabase-config.js` with your project URL and Supabase publishable key.
+5. Serve the folder using a local static web server, or deploy it to GitHub Pages.
+6. Configure Supabase Auth's allowed redirect URLs for your local and deployed URLs.
 
-Example configuration:
+Example configuration (replace both placeholders):
 
-```javascript
-window.REVENUEFORGE_SUPABASE_URL = "(https://cussolbbbvlvzptsaxmi.supabase.co)";
-window.REVENUEFORGE_SUPABASE_KEY = "sb_publishable_OjIDVXfIuPENkmSk6SW4zA_SIabQvtj";
+```js
+window.REVENUEFORGE_SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+window.REVENUEFORGE_SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
 ```
 
-Never place a Supabase service-role key in frontend code.
+A Supabase publishable key is designed for client-side use when RLS is correctly configured. **Never expose a service-role or secret key in frontend code or GitHub.**
 
-## Current Limitations
+## Limitations
 
-- Follow-up messages are generated from built-in templates; they are not automatically sent.
-- Reports currently focus on lead counts and conversion rates.
-- No payment processing or automated revenue tracking is implemented.
-- No external CRM integrations are currently available.
+- Follow-up content is generated as text templates; it is not sent automatically.
+- Reports are basic counts and conversion-rate summaries.
+- No payment processing, revenue attribution or external CRM integration is implemented.
+- This project has not been independently security-audited.
 
-## Project Purpose
+## Run locally
 
-RevenueForge demonstrates practical frontend development, database integration, authentication, CRUD operations and dashboard reporting.
+Open the project through a local static server. Authentication and database features require a correctly configured Supabase project and internet access.
 
 ## Author
 
-**Tuquash**
-
-- GitHub: https://github.com/Tuquash
+Tuquash — https://github.com/Tuquash
